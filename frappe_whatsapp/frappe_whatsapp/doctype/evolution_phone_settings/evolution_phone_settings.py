@@ -5,5 +5,5 @@
 from frappe.model.document import Document
 
 
-class EvolutionAPISettings(Document):
+class EvolutionPhoneSettings(Document):
 	pass

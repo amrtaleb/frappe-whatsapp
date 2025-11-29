@@ -5,5 +5,5 @@
 from frappe.tests.utils import FrappeTestCase
 
 
-class TestEvolutionAPISettings(FrappeTestCase):
+class TestEvolutionPhoneSettings(FrappeTestCase):
 	pass

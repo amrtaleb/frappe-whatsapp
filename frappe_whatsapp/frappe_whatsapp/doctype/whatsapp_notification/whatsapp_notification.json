@@ -18,6 +18,7 @@
   "column_break_3",
   "disabled",
   "template",
+  "sender_number",
   "code",
   "attach_document_print",
   "custom_attachment",
@@ -208,11 +209,18 @@
    "label": "Notification Name",
    "reqd": 1,
    "unique": 1
+  },
+  {
+   "fieldname": "sender_number",
+   "fieldtype": "Link",
+   "label": "Sender Number",
+   "options": "Evolution Phone Settings",
+   "reqd": 1
   }
  ],
  "index_web_pages_for_search": 1,
  "links": [],
- "modified": "2025-03-03 11:30:47.397819",
+ "modified": "2025-11-29 22:20:52.594281",
  "modified_by": "Administrator",
  "module": "Frappe Whatsapp",
  "name": "WhatsApp Notification",
@@ -232,6 +240,7 @@
    "write": 1
   }
  ],
+ "row_format": "Dynamic",
  "sort_field": "modified",
  "sort_order": "DESC",
  "states": [],

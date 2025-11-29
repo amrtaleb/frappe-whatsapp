@@ -101,9 +101,6 @@ class WhatsAppNotification(Document):
             ):
                 return
 
-        # Get Evolution Settings
-        evolution_settings = frappe.get_single("Evolution API Settings")
-
         # Get phone number
         if self.field_name:
             phone_number = phone_no or doc_data[self.field_name]
@@ -212,10 +209,10 @@ class WhatsAppNotification(Document):
                          filename=None, template=None, doc_data=None, parameters=None):
         """Send message via Evolution API."""
 
-        evolution_settings = frappe.get_single("Evolution API Settings")
+        evolution_settings = frappe.get_doc("Evolution Phone Settings", self.sender_number)
 
         if not evolution_settings.base_url or not evolution_settings.instance_name:
-            frappe.throw("Evolution API settings not configured")
+            frappe.throw("Evolution Phone Settings not configured")
 
         headers = {
             "Content-Type": "application/json",
