@@ -1,5 +1,6 @@
 """Notification."""
 
+import base64
 import json
 
 import requests
@@ -10,7 +11,6 @@ from frappe import _dict, _
 from frappe.model.document import Document
 from frappe.utils.safe_exec import get_safe_globals, safe_exec
 from frappe.integrations.utils import make_post_request
-from frappe.desk.form.utils import get_pdf_link
 from frappe.utils import add_to_date, nowdate, datetime
 
 
@@ -148,9 +148,6 @@ class WhatsAppNotification(Document):
         filename = None
 
         if self.attach_document_print:
-            key = doc.get_document_share_key()
-            frappe.db.commit()
-
             print_format = "Standard"
             doctype = frappe.get_doc("DocType", doc_data['doctype'])
 
@@ -168,15 +165,30 @@ class WhatsAppNotification(Document):
                 )
                 print_format = default_print_format if default_print_format else print_format
 
-            from frappe.utils.print_format import get_pdf_link
-            link = get_pdf_link(
-                doc_data['doctype'],
-                doc_data['name'],
-                print_format=print_format
-            )
-
-            filename = f'{doc_data["name"]}.pdf'
-            attachment_url = f'{frappe.utils.get_url()}{link}&key={key}'
+            # Generate PDF using attach_print (handles permissions and PDF generation properly)
+            try:
+                pdf_data = frappe.attach_print(
+                    doc_data['doctype'],
+                    doc_data['name'],
+                    print_format=print_format,
+                    doc=doc
+                )
+                
+                # Convert PDF to base64
+                pdf_base64 = base64.b64encode(pdf_data["fcontent"]).decode('utf-8')
+                
+                filename = pdf_data["fname"]
+                attachment_url = pdf_base64
+            except Exception as e:
+                error_msg = str(e)
+                # Handle network/localhost errors with helpful message
+                if "HostNotFoundError" in error_msg or "network error" in error_msg.lower():
+                    frappe.throw(
+                        _("PDF generation failed due to network error. Please ensure your site URL is properly configured in site_config.json (set 'host_name') or use a publicly accessible URL instead of localhost."),
+                        title=_("PDF Generation Error")
+                    )
+                # Re-raise other errors
+                raise
 
         elif self.custom_attachment:
             filename = self.file_name
